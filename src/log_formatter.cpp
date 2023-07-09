@@ -1,0 +1,174 @@
+#include "log_formatter.hpp"
+
+#include <algorithm>
+#include <vector>
+
+#include "log_config.hpp"
+
+#include <cinttypes>
+
+template <typename T>
+void formatInteger(std::string &s, T integer) {
+	if(!integer) {
+		s.push_back('0');
+		return;
+	}
+	static const std::string digit("0123456789");
+	bool is_min = false;
+	if(integer < 0) {
+		s.push_back('-');
+		if(0 == (integer << 1)) {
+			// 全为1的二进制正数转化为十进制数时末尾不会为9，
+			// 故将`X_MIN`转化为`X_MAX`，之后再将其末尾加上1即可
+			is_min = true;
+			integer = ~integer;
+		} else {
+			integer = -integer;
+		}
+	}
+	uint64_t size = s.size();
+	while(integer) {
+		s.push_back(digit[integer % 10]);
+		integer /= 10;
+	}
+	std::reverse(s.begin() + size, s.end());
+	s.back() += is_min;
+}
+
+template <typename T>
+void formatFloat(std::string &s, T f) {
+	char buffer[64];
+	snprintf(buffer, sizeof(buffer), "%g", f);
+	s.append(buffer);
+}
+
+template <typename T>
+void formatPointer(std::string &s, T f) {
+	char buffer[64];
+	snprintf(buffer, sizeof(buffer), "%p", f);
+	s.append(buffer);
+}
+
+log::LogFormatter::LogFormatter(std::string &s, LogLevel level) :format_str_(s), level_(level) {
+}
+
+log::LogFormatter &log::LogFormatter::operator<<(const bool t) {
+	if(!LogConfig::getInstance().check_level(level_)) {
+		return *this;
+	}
+	static std::string bool_str[2] = { "false", "true" };
+	format_str_.append(bool_str[t]);
+	return *this;
+}
+
+log::LogFormatter &log::LogFormatter::operator<<(const log::LogLevel level) {
+	if(!LogConfig::getInstance().check_level(level_)) {
+		return *this;
+	}
+	format_str_.append(get_log_level_str(level));
+	return *this;
+}
+
+log::LogFormatter &log::LogFormatter::operator<<(const char t) {
+	if(!LogConfig::getInstance().check_level(level_)) {
+		return *this;
+	}
+	format_str_.push_back(t);
+	return *this;
+}
+
+log::LogFormatter &log::LogFormatter::operator<<(const unsigned char t) {
+	if(!LogConfig::getInstance().check_level(level_)) {
+		return *this;
+	}
+	format_str_.push_back(t);
+	return *this;
+}
+
+log::LogFormatter &log::LogFormatter::operator<<(const int16_t t) {
+	if(!LogConfig::getInstance().check_level(level_)) {
+		return *this;
+	}
+	formatInteger(format_str_, t);
+	return *this;
+}
+
+log::LogFormatter &log::LogFormatter::operator<<(const uint16_t t) {
+	if(!LogConfig::getInstance().check_level(level_)) {
+		return *this;
+	}
+	formatInteger(format_str_, t);
+	return *this;
+}
+
+log::LogFormatter &log::LogFormatter::operator<<(const int32_t t) {
+	if(!LogConfig::getInstance().check_level(level_)) {
+		return *this;
+	}
+	formatInteger(format_str_, t);
+	return *this;
+}
+
+log::LogFormatter &log::LogFormatter::operator<<(const uint32_t t) {
+	if(!LogConfig::getInstance().check_level(level_)) {
+		return *this;
+	}
+	formatInteger(format_str_, t);
+	return *this;
+}
+
+log::LogFormatter &log::LogFormatter::operator<<(const int64_t t) {
+	if(!LogConfig::getInstance().check_level(level_)) {
+		return *this;
+	}
+	formatInteger(format_str_, t);
+	return *this;
+}
+
+log::LogFormatter &log::LogFormatter::operator<<(const uint64_t t) {
+	if(!LogConfig::getInstance().check_level(level_)) {
+		return *this;
+	}
+	formatInteger(format_str_, t);
+	return *this;
+}
+
+log::LogFormatter &log::LogFormatter::operator<<(const float t) {
+	if(!LogConfig::getInstance().check_level(level_)) {
+		return *this;
+	}
+	formatFloat(format_str_, t);
+	return *this;
+}
+
+log::LogFormatter &log::LogFormatter::operator<<(const double t) {
+	if(!LogConfig::getInstance().check_level(level_)) {
+		return *this;
+	}
+	formatFloat(format_str_, t);
+	return *this;
+}
+
+log::LogFormatter &log::LogFormatter::operator<<(const char *t) {
+	if(!LogConfig::getInstance().check_level(level_)) {
+		return *this;
+	}
+	format_str_.append(t);
+	return *this;
+}
+
+log::LogFormatter &log::LogFormatter::operator<<(const void *t) {
+	if(!LogConfig::getInstance().check_level(level_)) {
+		return *this;
+	}
+	formatPointer(format_str_, t);
+	return *this;
+}
+
+log::LogFormatter &log::LogFormatter::operator<<(const std::string &t) {
+	if(!LogConfig::getInstance().check_level(level_)) {
+		return *this;
+	}
+	format_str_.append(t);
+	return *this;
+}
