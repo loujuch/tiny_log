@@ -1,6 +1,6 @@
 SHELL = /bin/sh
 INC=./include
-CC=g++ -I${INC} -std=c++11
+CC=g++ -I${INC} -std=c++11 -g
 AR=ar rcs
 
 LibDir=./lib

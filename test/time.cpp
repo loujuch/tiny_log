@@ -6,15 +6,23 @@
 #include <vector>
 #include <fstream>
 
-int thread_num = 1024, loop_num = 1024 * 32;
+int thread_num = 1024, loop_num = 1024;
 
 void func(int p) {
 	for(int i = 0;i < loop_num;++i) {
-		log::log_fatal << p << ' ' << i << ' ' << "hello world!";
+		log::log_fatal << p << ' ' << i << ' ' << 3.14 * p + i << ' ' << "hello world!";
 	}
 }
 
 int main(int argc, char *argv[]) {
+	if(argc > 1) {
+		thread_num = atoi(argv[1]);
+		thread_num = thread_num > 0 ? thread_num : 64;
+	}
+	if(argc > 2) {
+		loop_num = atoi(argv[2]);
+		loop_num = loop_num > 0 ? loop_num : 64;
+	}
 	std::fstream f("./test.log", std::ios::app);
 	log::log_set_file_prefix(argv[0]);
 	log::log_set_level(log::LOG_ALL);

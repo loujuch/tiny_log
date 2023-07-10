@@ -5,8 +5,6 @@
 #include "log_config.hpp"
 #include "log_file.hpp"
 
-#include <iostream>
-
 std::atomic<bool> log::LogCore::running_(false);
 
 log::LogCore::LogCore() :run_(true), write_status_(WriteThreadStatus::WAIT_CREATE), is_empty(true),
@@ -14,7 +12,7 @@ write_thread_(std::bind(&LogCore::func, this)) {
 }
 
 void log::LogCore::append(const std::string &s) {
-	if(s.empty()) {
+	if(s.empty() || !LogConfig::getInstance().check_level(LogLevel::LOG_OFF)) {
 		return;
 	}
 	bool is;
