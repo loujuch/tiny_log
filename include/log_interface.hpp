@@ -8,6 +8,7 @@ namespace log {
 
 // 用户接口类，用于格式化用户数据，只有一个用法：LogInterface(...).stream()<<...;
 class LogInterface {
+	bool format_done_;
 	const LogLevel level_;
 	std::string prefix_;
 	std::string suffix_;

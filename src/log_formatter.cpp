@@ -38,7 +38,35 @@ void formatInteger(std::string &s, T integer) {
 template <typename T>
 void formatFloat(std::string &s, T f) {
 	char buffer[64];
-	snprintf(buffer, sizeof(buffer), "%g", f);
+	static constexpr T type_limit_min = 1e-4;
+	static constexpr T type_limit_max = 1e7;
+	if(f == 0.0) {
+		buffer[0] = '0';
+		buffer[1] = '\0';
+	} else if((f >= type_limit_min && f < type_limit_max) ||
+		(f > -type_limit_max && f <= -type_limit_min)) {
+		int n = snprintf(buffer, sizeof(buffer), "%f", f) - 1;
+		while(buffer[n] == '0') {
+			--n;
+		}
+		buffer[n + (buffer[n] != '.')] = '\0';
+	} else {
+		int e = snprintf(buffer, sizeof(buffer), "%e", f) - 1;
+		while(buffer[e] != 'e') {
+			--e;
+		}
+		int n = e - 1;
+		while(buffer[n] == '0') {
+			--n;
+		}
+		n += buffer[n] != '.';
+		if(e != n + 1) {
+			while(buffer[e] != '\0') {
+				buffer[n++] = buffer[e++];
+			}
+			buffer[n] = '\0';
+		}
+	}
 	s.append(buffer);
 }
 
