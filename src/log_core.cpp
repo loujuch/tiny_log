@@ -7,8 +7,11 @@
 
 std::atomic<bool> log::LogCore::running_(false);
 
-log::LogCore::LogCore() :run_(true), write_status_(WriteThreadStatus::WAIT_CREATE), is_empty(true),
-write_thread_(std::bind(&LogCore::func, this)) {
+log::LogCore::LogCore() :
+	run_(true),
+	write_status_(WriteThreadStatus::WAIT_CREATE),
+	is_empty(true),
+	write_thread_(std::bind(&LogCore::func, this)) {
 }
 
 void log::LogCore::append(const std::string &s) {
@@ -16,17 +19,18 @@ void log::LogCore::append(const std::string &s) {
 		return;
 	}
 	bool is;
-	core_mutex_.lock();
+	core_mutex_.lock_shared();
 	is = buffer_.append(s);
 	is_empty = false;
-	core_mutex_.unlock();
+	core_mutex_.unlock_shared();
 	if(is) {
 		core_cond_.notify_one();
 	}
 }
 
 void log::LogCore::switch_buffer(LogBufferList &buf) {
-	std::unique_lock<std::mutex> locker(core_mutex_);
+	std::mutex tmp_mutex;
+	std::unique_lock<std::mutex> locker(tmp_mutex);
 	do {
 		write_status_ = WriteThreadStatus::WAIT_SIGNAL;
 		write_status_ = (core_cond_.wait_for(locker, LogConfig::getInstance().log_sync_time())
@@ -34,10 +38,13 @@ void log::LogCore::switch_buffer(LogBufferList &buf) {
 			WriteThreadStatus::TimeOut :
 			WriteThreadStatus::NOTIFY;
 	} while(is_empty && run_);
+	tmp_mutex.unlock();
 	if(run_) {
 		write_status_ = WriteThreadStatus::WAIT_DATA;
+		core_mutex_.lock();
 		swap(buf, buffer_);
 		is_empty = true;
+		core_mutex_.unlock();
 		write_status_ = WriteThreadStatus::GET_DATA;
 	}
 	locker.unlock();

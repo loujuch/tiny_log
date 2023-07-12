@@ -4,7 +4,7 @@
 #include <thread>
 #include <condition_variable>
 #include <string>
-#include <mutex>
+#include <shared_mutex>
 #include <atomic>
 
 #include "log_buffer_list.hpp"
@@ -35,7 +35,7 @@ class LogCore {
 	std::atomic<WriteThreadStatus> write_status_;
 	std::atomic<bool> is_empty;
 	std::thread write_thread_;
-	std::mutex core_mutex_;
+	std::shared_mutex core_mutex_;
 	std::condition_variable core_cond_;
 	LogBufferList buffer_;
 

@@ -1,11 +1,14 @@
 #ifndef _LOG_BUFFER_LINK_HPP__
 #define _LOG_BUFFER_LINK_HPP__
 
+#include <mutex>
+
 #include "log_buffer.hpp"
 
 namespace log {
 
 class LogBufferList {
+	std::mutex assign_mutex_;
 	std::shared_ptr<LogBuffer> front_, cur_, back_;
 
 	inline void add_new() {

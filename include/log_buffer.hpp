@@ -1,7 +1,7 @@
 #ifndef _LOG_BUFFER_HPP__
 #define _LOG_BUFFER_HPP__
 
-#include <iostream>
+// #include <iostream>
 #include <memory>
 
 #include "log_config.hpp"
@@ -18,9 +18,18 @@ private:
 public:
 	LogBuffer();
 
-	void show() {
-		buffer_[size_ - (size_ == log_buffer_size)] = '\0';
-		std::cout << buffer_;
+	// void show() {
+	// 	buffer_[size_ - (size_ == log_buffer_size)] = '\0';
+	// 	std::cout << buffer_;
+	// }
+
+	inline char *assign(const std::string &s) {
+		if(free_size() < s.size()) {
+			return nullptr;
+		}
+		char *out = buffer_ + size_;
+		size_ += s.size();
+		return out;
 	}
 
 	inline unsigned size() const {

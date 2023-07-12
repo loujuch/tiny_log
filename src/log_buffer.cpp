@@ -1,6 +1,6 @@
 #include "log_buffer.hpp"
 
-#include <cstring>
+#include <string.h>
 
 log::LogBuffer::LogBuffer() :size_(0) {
 }
