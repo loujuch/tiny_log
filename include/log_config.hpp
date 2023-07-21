@@ -17,6 +17,10 @@ class LogConfig {
 	std::atomic<LogLevel> base_level_;
 
 	LogConfig();
+
+	static inline bool vaild(LogLevel base, LogLevel repeat) {
+		return (repeat <= base) && (base != LogLevel::LOG_OFF);
+	}
 public:
 	static constexpr unsigned log_buffer_size = 1024 * 1024;
 
@@ -65,7 +69,7 @@ public:
 	}
 
 	inline bool check_level(LogLevel level) {
-		return log::vaild(base_level_, level);
+		return vaild(base_level_, level);
 	}
 
 	LogConfig(const LogConfig &) = delete;

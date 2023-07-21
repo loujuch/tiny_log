@@ -18,17 +18,6 @@ enum class LogLevel : uint8_t {
 	LOG_ALL = 7
 }; // class LogLevel
 
-inline bool vaild(LogLevel base, LogLevel repeat) {
-	return (repeat <= base) && (base != LogLevel::LOG_OFF);
-}
-
-inline std::string get_log_level_str(LogLevel repeat) {
-	static std::string log_level_str[8] = {
-		"OFF", "FATAL", "ERROR", "WARN", "INFO", "DEBUG", "TRACE", "ALL"
-	};
-	return log_level_str[static_cast<unsigned>(repeat)];
-}
-
 } // namespace log
 
 #endif // _LOG_LEVEL_HPP__

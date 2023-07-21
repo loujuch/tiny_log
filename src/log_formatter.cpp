@@ -7,6 +7,13 @@
 
 #include <cinttypes>
 
+inline std::string get_log_level_str(log::LogLevel repeat) {
+	static std::string log_level_str[8] = {
+		"OFF", "FATAL", "ERROR", "WARN", "INFO", "DEBUG", "TRACE", "ALL"
+	};
+	return log_level_str[static_cast<unsigned>(repeat)];
+}
+
 template <typename T>
 void formatInteger(std::string &s, T integer) {
 	if(!integer) {

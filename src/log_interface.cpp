@@ -16,7 +16,7 @@ log::LogInterface::LogInterface(const char *file, const char *func,
 	}
 	log::LogFormatter(prefix_, level_) << '[' << LogTimeStamp::getInstance().get_time_stamp_str()
 		<< "] {" << ::gettid() << "->" << func << "} ["
-		<< get_log_level_str(level) << "] ";
+		<< level << "] ";
 	log::LogFormatter(suffix_, level_) << " [" << file << ':' << line << "]\n";
 	format_done_ = true;
 }
